@@ -1,6 +1,7 @@
 package com.atguigu.flinktutorial0815.wc;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
@@ -20,6 +21,8 @@ import org.apache.flink.util.Collector;
 public class StreamWordCount {
     public static void main(String[] args) throws Exception{
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        env.setParallelism(2);
+//        env.disableOperatorChaining();
 
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
         String host = parameterTool.get("host");
@@ -27,18 +30,21 @@ public class StreamWordCount {
         DataStreamSource<String> dataStreamSource = env.socketTextStream(host, port);
 
         SingleOutputStreamOperator<Tuple2<String, Long>> sum = dataStreamSource.flatMap(
-                   (String line, Collector<Tuple2<String, Long>> out) -> {
-                        // 按空格分割
-                        String[] words = line.split(" ");
-                        // 针对每个单词，包装成二元组输出
-                        for (String word : words) {
-                            out.collect(Tuple2.of(word, 1L));
+                        (String line, Collector<Tuple2<String, Long>> out) -> {
+                            // 按空格分割
+                            String[] words = line.split(" ");
+                            // 针对每个单词，包装成二元组输出
+                            for (String word : words) {
+                                out.collect(Tuple2.of(word, 1L));
+                            }
                         }
-                    }
                 )
                 .returns(Types.TUPLE(Types.STRING, Types.LONG))
+//                .returns(new TypeHint<Tuple2<String, Long>>() {})
                 .keyBy( value -> value.f0 )
-                .sum(1);
+                .sum(1)
+//                .startNewChain().slotSharingGroup("1")
+                ;
 
         sum.print();
 
