@@ -22,9 +22,9 @@ public class ReduceTest {
         DataStreamSource<ClickEvent> input = env.addSource(new ClickEventSource());
 
         // 统计每个用户最近一次访问时间戳，以及之前访问过的所有页面
-        input.keyBy(value -> value.user)
-                .reduce((value1, value2) -> {
-                    return new ClickEvent(value1.user, value1.url + ", " + value2.url, value2.ts);
+        input.keyBy(event -> event.user)
+                .reduce((data1, data2) -> {
+                    return new ClickEvent(data1.user, data1.url + ", " + data2.url, data2.ts);
                 })
                 .print();
 

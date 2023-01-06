@@ -1,6 +1,7 @@
 package com.atguigu.flinktutorial0815.chapter05;
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.apache.flink.streaming.api.watermark.Watermark;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -32,6 +33,8 @@ public class ClickEventSource implements SourceFunction<ClickEvent> {
             Long ts = Calendar.getInstance().getTimeInMillis();
 
             ctx.collect(new ClickEvent(user, url, ts));
+//            ctx.collectWithTimestamp(new ClickEvent(user, url, ts), ts);
+//            ctx.emitWatermark(new Watermark(ts));
 
             // 暂停1s
             Thread.sleep(1000);

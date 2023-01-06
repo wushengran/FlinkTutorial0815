@@ -1,0 +1,5 @@
+ClickEvent{user='Alice', url='./home', ts=1000}
+ClickEvent{user='Bob', url='./cart', ts=2000}
+ClickEvent{user='Bob', url='./home', ts=3000}
+ClickEvent{user='Bob', url='./prod?id=1', ts=4000}
+ClickEvent{user='Bob', url='./fav', ts=5000}
