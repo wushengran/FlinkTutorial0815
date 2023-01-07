@@ -30,16 +30,17 @@ public class MostActiveUserExample {
         SingleOutputStreamOperator<Tuple2<String, Long>> userCountStream = input.map(value -> Tuple2.of(value.user, 1L))
                 .returns(Types.TUPLE(Types.STRING, Types.LONG))
                 .keyBy(value -> value.f0)
-                .sum("f1");
+//                .sum("f1");
+                .reduce((value1, value2) -> Tuple2.of(value1.f0, value1.f1 + value2.f1));
 
         userCountStream.print("user count");
 
         // 2. 选取活跃度最大的数据
         SingleOutputStreamOperator<Tuple2<String, Long>> mostActiveUser = userCountStream.keyBy(value -> true)
 //                .maxBy("f1");
-                .reduce( (value1, value2) -> {
+                .reduce((value1, value2) -> {
                     return value1.f1 > value2.f1 ? value1 : value2;
-                } );
+                });
         mostActiveUser.print("most active user");
 
         env.execute();

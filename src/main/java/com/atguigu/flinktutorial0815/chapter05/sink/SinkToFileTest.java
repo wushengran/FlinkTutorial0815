@@ -34,7 +34,7 @@ public class SinkToFileTest {
         // 写入文件
 //        events.writeAsText("output/events.txt");
 
-        StreamingFileSink<String> streamingFileSink = StreamingFileSink.<String>forRowFormat(new Path("output"), new SimpleStringEncoder<>())
+        StreamingFileSink<String> streamingFileSink = StreamingFileSink.<String>forRowFormat(new Path("hdfs://hadoop102:8020/test"), new SimpleStringEncoder<>())
                 .withRollingPolicy(DefaultRollingPolicy.builder()
                         .withMaxPartSize(1024 * 1024 * 1024)
                         .build()
