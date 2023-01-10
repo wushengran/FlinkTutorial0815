@@ -108,6 +108,9 @@ public class TopNExample {
             builder.append("-------------------------------\n");
 
             out.collect(builder.toString());
+
+            // 清理状态
+            urlCountListState.clear();
         }
     }
 }

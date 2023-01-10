@@ -6,3 +6,4 @@ Bob, ./fav, 5000
 Bob, ./home, 6000
 Cary, ./home, 8000
 Mary, ./prod?id=1, 10000
+Alice, ./home, 12000
