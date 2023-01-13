@@ -4,6 +4,8 @@ import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableEnvironment;
 
+import static org.apache.flink.table.api.Expressions.$;
+
 /**
  * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
  * <p>
@@ -31,10 +33,23 @@ public class CommonAPITest {
                 " 'path' = 'input/clicks.txt'," +
                 " 'format' = 'csv'" +
                 ")");
+        // 直接基于注册在环境中的表，得到一个Table对象
+        Table clickTable = tableEnv.from("clicks");
+        clickTable.printSchema();
 
         // 2. 查询转换
         Table bobTable = tableEnv.sqlQuery("select url, uname, ts from clicks where uname = 'Bob'");
         Table userCountTable = tableEnv.sqlQuery("select uname, count(*) as cnt from clicks group by uname");
+
+        // 基于 Table 对象继续查询转换
+        // 2.1 调用table api
+        Table bobHomeTable = bobTable.where($("url").isEqual(" ./home"))
+                .select($("uname"), $("url"));
+
+        // 2.2 SQL
+        // 需要先在表环境中注册表
+        tableEnv.createTemporaryView("bob_clicks", bobTable);
+        Table bobHomeTable2 = tableEnv.sqlQuery("select url, uname, ts from bob_clicks where url = ' ./home'");
 
         // 3. 创建输出表
         tableEnv.executeSql("create table output (" +
@@ -53,6 +68,7 @@ public class CommonAPITest {
 
         // 4. 将结果表执行写入
 //        bobTable.executeInsert("output");
-        userCountTable.executeInsert("user_count");
+        bobHomeTable2.executeInsert("output");
+//        userCountTable.executeInsert("user_count");
     }
 }
